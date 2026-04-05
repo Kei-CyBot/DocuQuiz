@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router';
-import { Plus, Trash2, Save, ArrowLeft, Loader2, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, Save, ArrowLeft, Loader2, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 
 export function EditQuiz() {
@@ -17,6 +17,8 @@ export function EditQuiz() {
     show: false,
     message: ''
   });
+
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -177,7 +179,7 @@ export function EditQuiz() {
       });
 
       if (response.ok) {
-        navigate('/');
+        setShowSuccess(true);
       } else {
         setErrorConfig({ show: true, message: "Failed to save the quiz to the server. Please try again." });
       }
@@ -200,7 +202,6 @@ export function EditQuiz() {
   return (
     <div className="max-w-[800px] mx-auto w-full pb-24 relative px-4 sm:px-0">
       
-      {/* --- CUSTOM ERROR POP-UP --- */}
       {errorConfig.show && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" />
@@ -222,7 +223,27 @@ export function EditQuiz() {
         </div>
       )}
 
-      {/* Back Button */}
+      {showSuccess && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" />
+          <div className="relative bg-white border border-gray-100 shadow-2xl rounded-2xl p-8 w-full max-w-[320px] text-center animate-in zoom-in-95 duration-200">
+            <div className="mx-auto w-14 h-14 bg-green-50 rounded-full flex items-center justify-center mb-4">
+              <CheckCircle className="w-7 h-7 text-green-600" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Quiz Saved!</h3>
+            <p className="text-sm text-gray-500 mb-8 leading-relaxed">
+              Your edits have been successfully saved to your dashboard.
+            </p>
+            <button 
+              onClick={() => navigate('/')}
+              className="w-full bg-green-600 text-white py-3.5 rounded-xl font-bold hover:bg-green-700 transition-all active:scale-[0.95] shadow-lg"
+            >
+              Return to Dashboard
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="pt-8 pb-2">
         <Link to="/" className="text-gray-500 hover:text-gray-900 flex items-center gap-2 font-medium transition-colors w-fit">
           <ArrowLeft className="w-5 h-5" />
@@ -230,7 +251,6 @@ export function EditQuiz() {
         </Link>
       </div>
 
-      {/* Sticky Header Section */}
       <div className="sticky top-0 z-10 bg-gray-50/95 backdrop-blur-md pt-4 pb-4 mb-6 flex justify-between items-center border-b border-gray-200">
         <div className="flex-1 mr-4">
           <input 
@@ -251,7 +271,6 @@ export function EditQuiz() {
         </button>
       </div>
 
-      {/* Block List */}
       <div className="space-y-6">
         {questions.map((q, idx) => (
           <div key={q.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 relative group flex flex-col gap-5 hover:shadow-md transition-shadow">

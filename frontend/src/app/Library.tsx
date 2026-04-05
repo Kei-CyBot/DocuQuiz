@@ -171,17 +171,20 @@ export function Library() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden" ref={menuRef}>
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+      {/* Removed overflow-hidden from this container so the dropdown can break out if necessary */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200" ref={menuRef}>
+        {/* Added rounded-t-2xl to the header to preserve top border radius */}
+        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between rounded-t-2xl">
           <h3 className="font-bold text-gray-800">All Materials</h3>
         </div>
         
         {quizzes.length === 0 ? (
-          <div className="p-12 text-center text-gray-500 font-medium">
+          <div className="p-12 text-center text-gray-500 font-medium rounded-b-2xl">
             No quizzes found in your library yet. Generate one to get started!
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          /* Added max-h-[600px] and overflow-y-auto to create the scrollbar, and pb-24 so the last item's dropdown isn't cut off by the scroll boundary */
+          <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto pb-24 rounded-b-2xl">
             {quizzes.map((quiz) => {
               const userPoints = quizScores[quiz.id];
               const maxPoints = quiz.question_count * 10;

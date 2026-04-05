@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
-import { BookOpen, Mail, Lock, User, Building2, AlertTriangle } from 'lucide-react';
+import { BookOpen, Mail, Lock, User, Building2, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useAuth } from './context/AuthContext'; 
 
 export function Signup() {
@@ -16,6 +16,8 @@ export function Signup() {
     show: false,
     message: ''
   });
+
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const validateEmail = (email: string) => {
     return String(email)
@@ -48,7 +50,7 @@ export function Signup() {
 
     try {
       await signup(name, email, password, institution);
-      navigate('/');
+      setShowSuccess(true);
     } catch (error) {
       setErrorConfig({ 
         show: true, 
@@ -60,7 +62,6 @@ export function Signup() {
   return (
     <div className="min-h-screen bg-white flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans text-gray-900 relative">
       
-      {/* --- ERROR POP-UP --- */}
       {errorConfig.show && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]" />
@@ -80,6 +81,30 @@ export function Signup() {
               className="w-full bg-gray-900 text-white py-3 rounded-xl font-bold hover:bg-gray-800 transition-all active:scale-[0.95]"
             >
               Okay
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showSuccess && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]" />
+          
+          <div className="relative bg-white border border-gray-100 shadow-2xl rounded-2xl p-6 w-full max-w-[300px] text-center animate-in zoom-in-95 duration-200">
+            <div className="mx-auto w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mb-4">
+              <CheckCircle className="w-6 h-6 text-green-600" />
+            </div>
+            
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Account Created!</h3>
+            <p className="text-sm text-gray-500 mb-6 leading-relaxed">
+              Welcome to DocuQuizAI. Your registration was successful.
+            </p>
+            
+            <button 
+              onClick={() => navigate('/')}
+              className="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition-all active:scale-[0.95]"
+            >
+              Continue to Dashboard
             </button>
           </div>
         </div>

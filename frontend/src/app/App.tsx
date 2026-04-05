@@ -1,4 +1,3 @@
-// src/app/App.tsx
 import { RouterProvider } from 'react-router';
 import { router } from './routes';
 import { ScoreProvider } from './context/ScoreContext'; 

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router';
-import { ArrowLeft, CheckCircle, X, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { useScore } from './context/ScoreContext'; 
 import { useAuth } from './context/AuthContext';
+import { QuizResults } from './QuizResults'; 
 
 export function TakeQuiz() {
   const { saveScore } = useScore(); 
@@ -17,77 +18,96 @@ export function TakeQuiz() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [textAnswer, setTextAnswer] = useState(''); 
   const [score, setScore] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  
+  const [isFinished, setIsFinished] = useState(false);
+  const [userAnswers, setUserAnswers] = useState<Record<number, string | number>>({});
 
   useEffect(() => {
-  const fetchQuiz = async () => {
-    try {
+    const fetchQuiz = async () => {
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/api/quizzes/${id}`, {
+          method: "GET",
+          headers: {
+            'Authorization': `Bearer ${token}`, 
+            'Accept': 'application/json'         
+          }
+        });
+        
+        if (!response.ok) throw new Error('Failed to load quiz');
+        
+        const data = await response.json();
+        setQuiz(data);
+      } catch (err) {
+        setError('Could not load the quiz. Please try again.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id && token) {
+      fetchQuiz();
+    }
+  }, [id, token]); 
+
+  const handleNextOrSubmit = () => {
+    const currentQ = quiz.questions[currentQuestionIndex];
+    let isCorrect = false;
+    let answerToSave: string | number = '';
+
+    if (currentQ.options && currentQ.options.length > 0) {
+      if (selectedOption === null) return; 
+
+      answerToSave = selectedOption; 
+      const selectedText = currentQ.options[selectedOption];
+      const selectedLetter = String.fromCharCode(65 + selectedOption); 
       
-      const response = await fetch(`http://127.0.0.1:8000/api/quizzes/${id}`, {
-        method: "GET",
-        headers: {
-          'Authorization': `Bearer ${token}`, 
-          'Accept': 'application/json'         
-        }
-      });
-      
-      if (!response.ok) throw new Error('Failed to load quiz');
-      
-      const data = await response.json();
-      setQuiz(data);
-    } catch (err) {
-      setError('Could not load the quiz. Please try again.');
-      console.error(err);
-    } finally {
-      setLoading(false);
+      const normalizedAnswer = currentQ.answer.trim();
+
+      if (
+        normalizedAnswer === selectedText || 
+        normalizedAnswer === selectedLetter || 
+        normalizedAnswer.startsWith(`${selectedLetter}.`) ||
+        normalizedAnswer.startsWith(`${selectedLetter}:`)
+      ) {
+        isCorrect = true;
+      }
+    } 
+    else {
+      answerToSave = textAnswer; 
+      if (textAnswer.toLowerCase().trim() === currentQ.answer.toLowerCase().trim()) {
+        isCorrect = true;
+      }
+    }
+
+    setUserAnswers(prev => ({
+      ...prev,
+      [currentQuestionIndex]: answerToSave
+    }));
+
+    const newScore = isCorrect ? score + 1 : score;
+    if (isCorrect) setScore(newScore);
+
+    if (currentQuestionIndex < quiz.questions.length - 1) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+      setSelectedOption(null);
+      setTextAnswer('');
+    } else {
+      const totalPointsForThisQuiz = newScore * 10; 
+      saveScore(Number(id), totalPointsForThisQuiz);
+      setIsFinished(true); 
     }
   };
 
-  if (id && token) {
-    fetchQuiz();
-  }
-}, [id, token]); 
-
-  const handleNextOrSubmit = () => {
-  const currentQ = quiz.questions[currentQuestionIndex];
-  let isCorrect = false;
-
-  if (currentQ.options && currentQ.options.length > 0) {
-    if (selectedOption === null) return; 
-
-    const selectedText = currentQ.options[selectedOption];
-    const selectedLetter = String.fromCharCode(65 + selectedOption); 
-    
-    const normalizedAnswer = currentQ.answer.trim();
-
-    if (
-      normalizedAnswer === selectedText || 
-      normalizedAnswer === selectedLetter || 
-      normalizedAnswer.startsWith(`${selectedLetter}.`) ||
-      normalizedAnswer.startsWith(`${selectedLetter}:`)
-    ) {
-      isCorrect = true;
-    }
-  } 
-  else {
-    if (textAnswer.toLowerCase().trim() === currentQ.answer.toLowerCase().trim()) {
-      isCorrect = true;
-    }
-  }
-
-  const newScore = isCorrect ? score + 1 : score;
-  if (isCorrect) setScore(newScore);
-
-  if (currentQuestionIndex < quiz.questions.length - 1) {
-    setCurrentQuestionIndex((prev) => prev + 1);
+  const handleRetake = () => {
+    setIsFinished(false);
+    setCurrentQuestionIndex(0);
+    setScore(0);
     setSelectedOption(null);
     setTextAnswer('');
-  } else {
-    const totalPointsForThisQuiz = newScore * 10; 
-    saveScore(Number(id), totalPointsForThisQuiz);
-    setIsModalOpen(true);
-  }
-};
+    setUserAnswers({});
+  };
 
   if (loading) {
     return (
@@ -110,14 +130,20 @@ export function TakeQuiz() {
     );
   }
 
+  if (isFinished) {
+    return (
+      <QuizResults 
+        quiz={quiz} 
+        userAnswers={userAnswers} 
+        totalScore={score} 
+        onRetake={handleRetake} 
+      />
+    );
+  }
+
   const currentQ = quiz.questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === quiz.questions.length - 1;
-  const progressPercentage = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
-  const finalScorePercentage = Math.round((score / quiz.questions.length) * 100);
-  const isPassing = finalScorePercentage >= 70; 
-
-  const circleCircumference = 452.39; 
-  const strokeDashoffset = circleCircumference - (circleCircumference * (finalScorePercentage / 100));
+  const progressPercentage = ((currentQuestionIndex) / quiz.questions.length) * 100;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-gray-900">
@@ -155,7 +181,7 @@ export function TakeQuiz() {
 
         {currentQ.options && currentQ.options.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12 w-full">
-            {currentQ.options && currentQ.options.map((opt: string, idx: number) => {
+            {currentQ.options.map((opt: string, idx: number) => {
               const isSelected = selectedOption === idx;
               const letter = String.fromCharCode(65 + idx);
               return (
@@ -206,68 +232,6 @@ export function TakeQuiz() {
           </button>
         </div>
       </div>
-
-      {/* Results Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-xl max-w-sm w-full p-8 relative animate-fade-in-up">
-            <Link to="/" className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
-              <X className="w-5 h-5" />
-            </Link>
-
-            <div className="flex flex-col items-center text-center mt-2">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8">Quiz Complete!</h2>
-              
-              {/* Circular Score Graphic */}
-              <div className="relative w-40 h-40 mb-6">
-                <svg className="w-full h-full transform -rotate-90">
-                  {/* Background circle */}
-                  <circle 
-                    cx="80" cy="80" r="72" 
-                    className="stroke-gray-100" 
-                    strokeWidth="12" 
-                    fill="none" 
-                  />
-                  {/* Progress circle */}
-                  <circle 
-                    cx="80" cy="80" r="72" 
-                    className={`${isPassing ? 'stroke-emerald-500' : 'stroke-red-500'}`} 
-                    strokeWidth="12" 
-                    fill="none" 
-                    strokeLinecap="round"
-                    strokeDasharray={circleCircumference} 
-                    strokeDashoffset={strokeDashoffset} 
-                    style={{ transition: 'stroke-dashoffset 1s ease-out' }}
-                  />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className={`text-4xl font-black tracking-tighter ${isPassing ? 'text-gray-900' : 'text-red-500'}`}>
-                    {finalScorePercentage}
-                  </span>
-                  <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-1">/100</span>
-                </div>
-              </div>
-
-              {/* Dynamic Pass/Fail Badge */}
-              <div className={`px-5 py-2 rounded-full text-sm font-bold flex items-center gap-2 mb-8 border ${
-                isPassing 
-                  ? 'bg-emerald-100 text-emerald-700 border-emerald-200' 
-                  : 'bg-red-100 text-red-700 border-red-200'
-              }`}>
-                {isPassing ? <CheckCircle className="w-5 h-5" /> : <X className="w-5 h-5" />}
-                {isPassing ? 'Passed' : 'Needs Review'}
-              </div>
-
-              <div className="flex flex-col w-full gap-3">
-                <p className="text-gray-500 font-medium mb-2">You got {score} out of {quiz.questions.length} correct.</p>
-                <Link to="/" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3.5 rounded-xl font-bold transition-colors shadow-sm shadow-indigo-200">
-                  Back to Dashboard
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
