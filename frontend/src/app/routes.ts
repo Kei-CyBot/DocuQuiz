@@ -1,0 +1,39 @@
+// src/app/routes.ts
+import { createBrowserRouter } from "react-router";
+import { Root } from "./Root";
+import { Home } from "./Home";
+import { CreateQuiz } from "./CreateQuiz";
+import { EditQuiz } from "./EditQuiz";
+import { NotFound } from "./NotFound";
+import { TakeQuiz } from "./TakeQuiz";
+import { Login } from "./Login";
+import { Signup } from "./Signup";
+import { Settings } from "./Settings"; // Added
+import { Library } from "./Library";   // Added
+
+export const router = createBrowserRouter([
+  {
+    path: "/",
+    Component: Root,
+    children: [
+      { index: true, Component: Home },
+      { path: "create", Component: CreateQuiz },
+      { path: "edit/:id", Component: EditQuiz },
+      { path: "library", Component: Library },   // Updated
+      { path: "settings", Component: Settings }, // Updated
+      { path: "*", Component: NotFound },
+    ],
+  },
+  {
+    path: "/take/:id",
+    Component: TakeQuiz
+  },
+  {
+    path: "/login",
+    Component: Login
+  },
+  {
+    path: "/signup",
+    Component: Signup
+  }
+]);
