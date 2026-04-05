@@ -1,7 +1,6 @@
-// src/app/components/LoginModal.tsx
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
-import { BookOpen, Mail, Lock, X, AlertTriangle } from 'lucide-react'; // Added AlertTriangle
+import { BookOpen, Mail, Lock, X, AlertTriangle } from 'lucide-react'; 
 import { useAuth } from '../app/context/AuthContext'; 
 
 export function LoginModal() {
@@ -11,9 +10,8 @@ export function LoginModal() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const [showError, setShowError] = useState(false); // New state for custom pop-up
+  const [showError, setShowError] = useState(false); 
 
-  // If state is false, render absolutely nothing
   if (!isLoginModalOpen) return null;
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -23,24 +21,21 @@ export function LoginModal() {
       setLoginModalOpen(false); 
       navigate('/');
     } catch (error) {
-      // Replaced alert with custom pop-up state
       setShowError(true); 
     }
   };
 
   const closeAndNavigate = () => {
     setLoginModalOpen(false);
-    setShowError(false); // Reset error on close
+    setShowError(false); 
   };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
       <div className="bg-white py-8 px-4 sm:rounded-2xl sm:px-10 border border-gray-100 shadow-2xl w-full max-w-md relative animate-in fade-in zoom-in-95 duration-200">
         
-        {/* --- CUSTOM ERROR POP-UP (MATCHES GENERATE QUIZ STYLE) --- */}
         {showError && (
           <div className="absolute inset-0 z-[110] flex items-center justify-center p-6">
-            {/* Inner Backdrop to dim the login form specifically */}
             <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] sm:rounded-2xl" />
             
             <div className="relative bg-white border border-gray-100 shadow-2xl rounded-2xl p-6 w-full max-w-[300px] text-center animate-in zoom-in-95 duration-200">
@@ -63,7 +58,6 @@ export function LoginModal() {
           </div>
         )}
 
-        {/* Close Button */}
         <button 
           onClick={closeAndNavigate}
           className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"

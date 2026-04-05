@@ -1,4 +1,3 @@
-// src/app/EditQuiz.tsx
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router';
 import { Plus, Trash2, Save, ArrowLeft, Loader2, AlertTriangle } from 'lucide-react';
@@ -14,7 +13,6 @@ export function EditQuiz() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Error Pop-up State
   const [errorConfig, setErrorConfig] = useState<{ show: boolean; message: string }>({
     show: false,
     message: ''
@@ -129,7 +127,6 @@ export function EditQuiz() {
   };
 
   const handleSave = async () => {
-    // --- VALIDATION ---
     if (!title.trim()) {
       setErrorConfig({ show: true, message: "Please provide a title for your quiz." });
       return;
@@ -150,7 +147,6 @@ export function EditQuiz() {
           return;
         }
       } else {
-        // Identification or Fill in the Blank
         if (!q.exactAnswer.trim()) {
           setErrorConfig({ show: true, message: `Question #${qNum} requires a correct answer. Please don't leave it blank.` });
           return;

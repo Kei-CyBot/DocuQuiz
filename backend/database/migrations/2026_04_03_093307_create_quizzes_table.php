@@ -16,7 +16,7 @@ return new class extends Migration
         $table->enum('difficulty', ['Easy', 'Medium', 'Hard']);
         $table->string('type');
         $table->integer('question_count');
-        $table->integer('time_limit_mins')->default(30); // E.g., "~30 mins" from your UI
+        $table->integer('time_limit_mins')->default(30); 
         
         $table->timestamps();
     });

@@ -1,35 +1,33 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router';
 import { ArrowLeft, CheckCircle, X, Loader2 } from 'lucide-react';
-import { useScore } from './context/ScoreContext'; // 1. Imported the Context
+import { useScore } from './context/ScoreContext'; 
 import { useAuth } from './context/AuthContext';
 
 export function TakeQuiz() {
-  const { saveScore } = useScore(); // 2. Initialized the hook
-  const { token } = useAuth(); // 3. Initialized the auth hook
+  const { saveScore } = useScore(); 
+  const { token } = useAuth(); 
   const { id } = useParams();
   
-  // --- Dynamic State Variables ---
   const [quiz, setQuiz] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [textAnswer, setTextAnswer] = useState(''); // For Identification type
+  const [textAnswer, setTextAnswer] = useState(''); 
   const [score, setScore] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // --- Fetch the Quiz from Laravel ---
   useEffect(() => {
   const fetchQuiz = async () => {
     try {
-      // Added headers to prove to Laravel who we are
+      
       const response = await fetch(`http://127.0.0.1:8000/api/quizzes/${id}`, {
         method: "GET",
         headers: {
-          'Authorization': `Bearer ${token}`, // The "Key"
-          'Accept': 'application/json'         // Tells Laravel to send JSON, not HTML
+          'Authorization': `Bearer ${token}`, 
+          'Accept': 'application/json'         
         }
       });
       
@@ -45,26 +43,21 @@ export function TakeQuiz() {
     }
   };
 
-  // Only run if we have an ID and a Token
   if (id && token) {
     fetchQuiz();
   }
-}, [id, token]); // Add token as a dependency
+}, [id, token]); 
 
-  // --- Handle Moving to the Next Question or Submitting ---
   const handleNextOrSubmit = () => {
   const currentQ = quiz.questions[currentQuestionIndex];
   let isCorrect = false;
 
-  // 1. Determine if the question is selection-based (Multiple Choice / True-False)
-  // We check if 'options' exists and has items
   if (currentQ.options && currentQ.options.length > 0) {
-    if (selectedOption === null) return; // Prevent submission if no option is picked
+    if (selectedOption === null) return; 
 
     const selectedText = currentQ.options[selectedOption];
-    const selectedLetter = String.fromCharCode(65 + selectedOption); // A, B, C...
+    const selectedLetter = String.fromCharCode(65 + selectedOption); 
     
-    // Normalize AI answers (it might send "A", "A.", or the full text)
     const normalizedAnswer = currentQ.answer.trim();
 
     if (
@@ -76,31 +69,26 @@ export function TakeQuiz() {
       isCorrect = true;
     }
   } 
-  // 2. Otherwise, treat it as text-based (Identification / Fill-in-the-Blanks)
   else {
     if (textAnswer.toLowerCase().trim() === currentQ.answer.toLowerCase().trim()) {
       isCorrect = true;
     }
   }
 
-  // 3. Update score (Use a temporary variable for the "Last Question" logic)
   const newScore = isCorrect ? score + 1 : score;
   if (isCorrect) setScore(newScore);
 
-  // 4. Navigation Logic
   if (currentQuestionIndex < quiz.questions.length - 1) {
     setCurrentQuestionIndex((prev) => prev + 1);
     setSelectedOption(null);
     setTextAnswer('');
   } else {
-    // Save points using the most up-to-date score calculation
     const totalPointsForThisQuiz = newScore * 10; 
     saveScore(Number(id), totalPointsForThisQuiz);
     setIsModalOpen(true);
   }
 };
 
-  // --- Loading & Error States ---
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center flex-col gap-4">
@@ -122,20 +110,17 @@ export function TakeQuiz() {
     );
   }
 
-  // --- Setup Dynamic Variables for UI ---
   const currentQ = quiz.questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === quiz.questions.length - 1;
   const progressPercentage = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
   const finalScorePercentage = Math.round((score / quiz.questions.length) * 100);
-  const isPassing = finalScorePercentage >= 70; // Assuming 70% is passing
+  const isPassing = finalScorePercentage >= 70; 
 
-  // Calculate SVG stroke offset for the circular chart
-  const circleCircumference = 452.39; // 2 * pi * r (where r=72)
+  const circleCircumference = 452.39; 
   const strokeDashoffset = circleCircumference - (circleCircumference * (finalScorePercentage / 100));
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-gray-900">
-      {/* Top Bar - Distraction Free */}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
         <Link to="/" className="text-gray-500 hover:text-gray-900 flex items-center gap-2 font-medium transition-colors">
           <ArrowLeft className="w-5 h-5" />
@@ -155,10 +140,9 @@ export function TakeQuiz() {
           </div>
         </div>
 
-        <div className="w-[88px] hidden sm:block"></div> {/* Spacer to keep center balanced */}
+        <div className="w-[88px] hidden sm:block"></div> 
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 max-w-4xl mx-auto w-full px-6 py-12 flex flex-col items-center justify-center">
         <div className="mb-12 text-center max-w-2xl">
           <span className="inline-block px-4 py-1.5 bg-indigo-50 text-indigo-700 font-bold text-sm rounded-full mb-6 border border-indigo-100">
@@ -169,7 +153,6 @@ export function TakeQuiz() {
           </h1>
         </div>
 
-        {/* Conditionally Render Multiple Choice OR Identification */}
         {currentQ.options && currentQ.options.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12 w-full">
             {currentQ.options && currentQ.options.map((opt: string, idx: number) => {

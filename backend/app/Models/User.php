@@ -24,7 +24,6 @@ class User extends Authenticatable
         'institution', 
         'email',
         'password',
-        // --- NEW: Allow settings to be saved to the database ---
         'email_alerts',
         'weekly_summary',
         'public_profile',
@@ -51,7 +50,6 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            // --- NEW: Tell Laravel to treat these as true/false ---
             'email_alerts' => 'boolean',
             'weekly_summary' => 'boolean',
             'public_profile' => 'boolean',

@@ -8,7 +8,6 @@ export default function App() {
   return (
     <AuthProvider>
       <ScoreProvider>
-        {/* REMOVE LoginModal from here! */}
         <RouterProvider router={router} />
       </ScoreProvider>
     </AuthProvider>

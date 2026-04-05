@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('quizzes', function (Blueprint $table) {
-            // We use nullable() so it doesn't break any old quizzes you already made
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
         });
     }

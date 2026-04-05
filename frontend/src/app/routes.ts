@@ -1,4 +1,3 @@
-// src/app/routes.ts
 import { createBrowserRouter } from "react-router";
 import { Root } from "./Root";
 import { Home } from "./Home";
@@ -8,8 +7,8 @@ import { NotFound } from "./NotFound";
 import { TakeQuiz } from "./TakeQuiz";
 import { Login } from "./Login";
 import { Signup } from "./Signup";
-import { Settings } from "./Settings"; // Added
-import { Library } from "./Library";   // Added
+import { Settings } from "./Settings"; 
+import { Library } from "./Library";   
 
 export const router = createBrowserRouter([
   {
@@ -19,8 +18,8 @@ export const router = createBrowserRouter([
       { index: true, Component: Home },
       { path: "create", Component: CreateQuiz },
       { path: "edit/:id", Component: EditQuiz },
-      { path: "library", Component: Library },   // Updated
-      { path: "settings", Component: Settings }, // Updated
+      { path: "library", Component: Library },   
+      { path: "settings", Component: Settings }, 
       { path: "*", Component: NotFound },
     ],
   },

@@ -1,10 +1,9 @@
-// src/app/components/Sidebar.tsx
 import { LayoutDashboard, Library, Settings, BookOpen, Lock } from 'lucide-react';
 import { NavLink } from 'react-router';
-import { useAuth } from '../app/context/AuthContext'; // 1. Import useAuth
+import { useAuth } from '../app/context/AuthContext'; 
 
 export function Sidebar() {
-  const { token } = useAuth(); // 2. Get the token
+  const { token } = useAuth(); 
 
   return (
     <div className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col">
@@ -31,7 +30,6 @@ export function Sidebar() {
           Dashboard
         </NavLink>
 
-        {/* 3. Wrap private links in a token check */}
         {token ? (
           <>
             <NavLink 
@@ -58,7 +56,6 @@ export function Sidebar() {
             </NavLink>
           </>
         ) : (
-          /* Show a "Locked" placeholder for guests if you want them to see what they're missing */
           <div className="px-3 py-2.5 text-gray-400 flex items-center gap-3 italic text-sm">
             <Lock className="w-4 h-4" />
             Login to view Library

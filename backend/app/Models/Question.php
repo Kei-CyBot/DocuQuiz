@@ -11,7 +11,6 @@ class Question extends Model
 
     protected $fillable = ['quiz_id', 'question', 'options', 'answer'];
 
-    // This tells Laravel to automatically convert the options array to JSON in the database
     protected $casts = [
         'options' => 'array', 
     ];

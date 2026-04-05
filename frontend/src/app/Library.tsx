@@ -5,10 +5,10 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router'; 
 import { useScore } from './context/ScoreContext'; 
-import { useAuth } from './context/AuthContext'; // 1. Added Auth Context
+import { useAuth } from './context/AuthContext'; 
 
 export function Library() {
-  const { token } = useAuth(); // 2. Grab the token
+  const { token } = useAuth(); 
   const [quizzes, setQuizzes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -22,7 +22,6 @@ export function Library() {
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
-        // 3. Added headers to the GET request
         const response = await fetch('http://127.0.0.1:8000/api/quizzes', {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -44,7 +43,7 @@ export function Library() {
     if (token) {
       fetchQuizzes();
     }
-  }, [token]); // Added token as a dependency
+  }, [token]); 
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -59,7 +58,6 @@ export function Library() {
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this quiz? This cannot be undone.")) {
       try {
-        // 4. Added headers to the DELETE request
         const response = await fetch(`http://127.0.0.1:8000/api/quizzes/${id}`, {
           method: 'DELETE',
           headers: {
@@ -86,7 +84,6 @@ export function Library() {
     setActiveMenuId(null);
   };
 
-  // --- UPDATED: Dynamic Statistics Calculations ---
   const totalQuizzes = quizzes.length;
 
   const perfectScores = quizzes.reduce((count, quiz) => {

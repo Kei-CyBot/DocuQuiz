@@ -15,7 +15,7 @@ return new class extends Migration
         $table->id();
         $table->foreignId('quiz_id')->constrained()->onDelete('cascade');
         $table->text('question');
-        $table->json('options')->nullable(); // We save options as a JSON array
+        $table->json('options')->nullable(); 
         $table->string('answer');
         $table->timestamps();
     });

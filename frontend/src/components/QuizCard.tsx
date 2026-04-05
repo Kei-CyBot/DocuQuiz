@@ -7,7 +7,6 @@ export interface QuizCardProps {
   difficulty: 'Easy' | 'Medium' | 'Hard';
   type: 'Multiple Choice' | 'Identification';
   questionCount: number;
-  // --- NEW: Add the onDelete prop type ---
   onDelete?: (id: number) => void; 
 }
 
@@ -56,7 +55,6 @@ export function QuizCard({ id, title, difficulty, type, questionCount, onDelete 
         <Link to={`/edit/${id}`} className="p-2.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors border border-transparent hover:border-indigo-100 flex items-center justify-center" title="Edit Quiz">
           <Edit2 className="w-5 h-5" />
         </Link>
-        {/* --- NEW: Attach the onClick handler --- */}
         <button 
           onClick={() => onDelete && onDelete(id)}
           className="p-2.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100" 

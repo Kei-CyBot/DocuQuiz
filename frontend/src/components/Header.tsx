@@ -1,4 +1,3 @@
-// src/app/components/Header.tsx
 import { useState } from 'react';
 import { Award, Bell, User, LogOut, Settings as SettingsIcon, BookOpen, LogIn } from 'lucide-react';
 import { useScore } from '../app/context/ScoreContext'; 
@@ -7,12 +6,10 @@ import { useAuth } from '../app/context/AuthContext';
 
 export function Header() {
   const { totalPoints } = useScore();
-  // 1. Pull token and setLoginModalOpen from Context
   const { user, token, logout, setLoginModalOpen } = useAuth(); 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Dynamically get the first name
   const firstName = user?.name ? user.name.split(' ')[0] : '';
 
   const handleLogout = () => {

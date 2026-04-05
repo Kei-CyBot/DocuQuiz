@@ -1,4 +1,3 @@
-// src/app/NotFound.tsx
 import { Link } from "react-router";
 import { MapPinOff } from "lucide-react";
 

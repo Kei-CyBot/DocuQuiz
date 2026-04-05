@@ -1,7 +1,6 @@
-// src/app/Login.tsx
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
-import { BookOpen, Mail, Lock, AlertTriangle } from 'lucide-react'; // Added AlertTriangle
+import { BookOpen, Mail, Lock, AlertTriangle } from 'lucide-react'; 
 import { useAuth } from './context/AuthContext'; 
 
 export function Login() {
@@ -11,7 +10,7 @@ export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const [showError, setShowError] = useState(false); // New state for custom pop-up
+  const [showError, setShowError] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +18,6 @@ export function Login() {
       await login(email, password, rememberMe); 
       navigate('/');
     } catch (error) {
-      // Replaced alert with custom pop-up state
       setShowError(true);
     }
   };

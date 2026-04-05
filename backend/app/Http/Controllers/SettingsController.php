@@ -3,11 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash; // <-- Added this to safely encrypt the new password!
+use Illuminate\Support\Facades\Hash; 
 
 class SettingsController extends Controller
 {
-    // 1. Handle Notifications
     public function updateNotifications(Request $request)
     {
         $user = $request->user();
@@ -19,7 +18,6 @@ class SettingsController extends Controller
         return response()->json(['message' => 'Notifications saved!']);
     }
 
-    // 2. Handle Privacy
     public function updatePrivacy(Request $request)
     {
         $user = $request->user();
@@ -31,13 +29,11 @@ class SettingsController extends Controller
         return response()->json(['message' => 'Privacy saved!']);
     }
 
-    // 3. Handle Profile (Name, Email, Institution)
     public function updateProfile(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'institution' => 'nullable|string|max:255',
-            // Ensure the email is unique, but ignore the current user's own email!
             'email' => 'required|string|email|max:255|unique:users,email,' . $request->user()->id, 
         ]);
 
@@ -54,7 +50,6 @@ class SettingsController extends Controller
         ]);
     }
 
-    // 4. Handle Password Change
     public function updatePassword(Request $request)
     {
         $request->validate([

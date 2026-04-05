@@ -1,21 +1,19 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router"; 
 import { QuizCard, type QuizCardProps } from '../components/QuizCard';
-import { useAuth } from './context/AuthContext'; // 1. Added Auth Context
+import { useAuth } from './context/AuthContext'; 
 
 export function Home() {
-  const { token } = useAuth(); // 2. Grab the token
+  const { token } = useAuth(); 
   const [quizzes, setQuizzes] = useState<QuizCardProps[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Search and Filter States
   const [searchQuery, setSearchQuery] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState("All");
   const [typeFilter, setTypeFilter] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
-    // 3. Added headers to the GET request
     fetch("http://127.0.0.1:8000/api/quizzes", {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -42,13 +40,12 @@ export function Home() {
         console.error("Failed to fetch quizzes:", error);
         setIsLoading(false);
       });
-  }, [token]); // Added token as a dependency
+  }, [token]); 
 
   const handleDelete = async (id: number) => {
     if (!window.confirm("Are you sure you want to delete this quiz? This cannot be undone.")) return;
 
     try {
-      // 4. Added headers to the DELETE request
       const response = await fetch(`http://127.0.0.1:8000/api/quizzes/${id}`, {
         method: 'DELETE',
         headers: {
@@ -68,11 +65,9 @@ export function Home() {
     }
   };
 
-  // Upgraded Filter Logic: Now case-insensitive!
   const filteredQuizzes = quizzes.filter((quiz) => {
     const matchesSearch = quiz.title.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // Using .toLowerCase() ensures "Easy" matches "easy" from the database
     const matchesDifficulty = difficultyFilter === "All" || 
       (quiz.difficulty && quiz.difficulty.toLowerCase() === difficultyFilter.toLowerCase());
       

@@ -1,4 +1,3 @@
-// src/app/Settings.tsx
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Building2, LogOut, Bell, Shield, Key, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router';
@@ -9,35 +8,29 @@ type Tab = 'profile' | 'notifications' | 'privacy' | 'password';
 
 export function Settings() {
   const navigate = useNavigate();
-  // Added updateUser here to safely merge profile changes!
   const { user, token, logout, updateUser } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('profile');
 
-  // Status State
   const [isLoading, setIsLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  // 1. Profile State
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
     email: user?.email || '',
     institution: user?.institution || '',
   });
 
-  // 2. Notifications State
   const [notifications, setNotifications] = useState({
     emailAlerts: user?.email_alerts ?? true,
     weeklySummary: user?.weekly_summary ?? true,
   });
 
-  // 3. Privacy State
   const [privacy, setPrivacy] = useState({
     publicProfile: user?.public_profile ?? false,
     dataSharing: user?.data_sharing ?? true,
   });
 
-  // 4. Password State
   const [passwordData, setPasswordData] = useState({
     current_password: '',
     new_password: '',
@@ -52,13 +45,11 @@ export function Settings() {
     }
   });
 
-  // Clear messages when switching tabs
   useEffect(() => {
     setSuccessMsg('');
     setErrorMsg('');
   }, [activeTab]);
 
-  // --- HANDLERS ---
 
   const handleProfileSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -67,10 +58,8 @@ export function Settings() {
     setSuccessMsg('');
 
     try {
-      // 1. Save the response to capture the updated user data from Laravel
       const response = await axios.put('http://localhost:8000/api/settings/profile', profileData, getAuthHeaders());
       
-      // 2. Update the React Context (this updates the header immediately without wiping progress!)
       if (updateUser) {
           updateUser(response.data.user);
       }
@@ -152,7 +141,6 @@ export function Settings() {
     navigate('/login');
   };
 
-  // Status Message Component (Reusable)
   const StatusMessage = () => (
     <>
       {errorMsg && (

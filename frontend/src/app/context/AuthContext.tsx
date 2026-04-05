@@ -1,4 +1,3 @@
-// src/app/context/AuthContext.tsx
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
 interface User {
@@ -32,7 +31,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoginModalOpen, setLoginModalOpen] = useState(false);
 
-  // Check BOTH storages when the app loads
   const [token, setToken] = useState<string | null>(() => {
     return localStorage.getItem('token') || sessionStorage.getItem('token') || null;
   });
@@ -64,7 +62,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [token]);
 
-  // Updated Login to accept rememberMe boolean
   const login = async (email: string, password: string, rememberMe: boolean) => {
     const response = await fetch(`${API_URL}/login`, {
       method: 'POST',
@@ -76,11 +73,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const data = await response.json();
     
-    // Core Remember Me Logic
     if (rememberMe) {
-      localStorage.setItem('token', data.token); // Survives browser close
+      localStorage.setItem('token', data.token); 
     } else {
-      sessionStorage.setItem('token', data.token); // Clears on browser close
+      sessionStorage.setItem('token', data.token); 
     }
     
     setToken(data.token);
@@ -97,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!response.ok) throw new Error('Signup failed');
 
     const data = await response.json();
-    localStorage.setItem('token', data.token); // Default to local for signup
+    localStorage.setItem('token', data.token); 
     setToken(data.token);
     setUser(data.user);
   };
@@ -114,7 +110,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
     
-    // Clear ALL storages
     localStorage.removeItem('token');
     sessionStorage.removeItem('token');
     

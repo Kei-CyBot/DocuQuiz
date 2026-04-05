@@ -1,4 +1,3 @@
-// src/app/Signup.tsx
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
 import { BookOpen, Mail, Lock, User, Building2, AlertTriangle } from 'lucide-react';
@@ -27,7 +26,6 @@ export function Signup() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // --- VALIDATION LOGIC ---
     if (name.trim().length < 2) {
       setErrorConfig({ show: true, message: "Please enter your full name." });
       return;
@@ -48,7 +46,6 @@ export function Signup() {
       return;
     }
 
-    // --- SUBMISSION ---
     try {
       await signup(name, email, password, institution);
       navigate('/');

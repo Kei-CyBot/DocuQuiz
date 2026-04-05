@@ -1,6 +1,5 @@
-// src/app/CreateQuiz.tsx
 import { useState } from 'react';
-import { UploadCloud, Sparkles, Loader2, CheckCircle, AlertTriangle } from 'lucide-react'; // Added AlertTriangle
+import { UploadCloud, Sparkles, Loader2, CheckCircle, AlertTriangle } from 'lucide-react'; 
 import { useNavigate } from 'react-router'; 
 import { useAuth } from './context/AuthContext';
 
@@ -21,7 +20,6 @@ export function CreateQuiz() {
   
   const [showModal, setShowModal] = useState(false); 
   
-  // New State for Error Pop-up
   const [errorConfig, setErrorConfig] = useState<{ show: boolean; message: string }>({
     show: false,
     message: ''
@@ -33,7 +31,6 @@ export function CreateQuiz() {
         return;
     }
    
-    // Validation for file and title
     if (!file && !title) {
       setErrorConfig({ show: true, message: "Please upload a source document and provide a quiz title to continue." });
       return;
