@@ -1,4 +1,3 @@
-
 # 🧠 AI Quiz Platform
 
 A full-stack web application that allows students and educators to seamlessly generate AI-powered quizzes, track their study statistics, and manage their learning profiles.
@@ -14,7 +13,7 @@ A full-stack web application that allows students and educators to seamlessly ge
 **Backend:**
 * Laravel (PHP)
 * MySQL
-* RESTful API
+* GEMINI API
 
 ---
 
@@ -54,7 +53,7 @@ php artisan key:generate
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=quiz_db
+DB_DATABASE=docuquiz_db
 DB_USERNAME=root
 DB_PASSWORD=
 
@@ -87,4 +86,3 @@ Once both servers are running:
 - Open your browser and go to the frontend URL (e.g., http://localhost:5173).
 - Register a new user account.
 - Start generating quizzes, updating your profile, and tracking your stats!
-  

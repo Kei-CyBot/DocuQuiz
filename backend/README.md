@@ -13,7 +13,7 @@ A full-stack web application that allows students and educators to seamlessly ge
 **Backend:**
 * Laravel (PHP)
 * MySQL
-* RESTful API
+* GEMINI API
 
 ---
 
@@ -53,7 +53,7 @@ php artisan key:generate
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=quiz_db
+DB_DATABASE=docuquiz_db
 DB_USERNAME=root
 DB_PASSWORD=
 
