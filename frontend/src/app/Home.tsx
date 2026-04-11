@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router"; 
+import { Trash2 } from "lucide-react"; 
 import { QuizCard, type QuizCardProps } from '../components/QuizCard';
 import { useAuth } from './context/AuthContext'; 
 
@@ -12,6 +13,8 @@ export function Home() {
   const [difficultyFilter, setDifficultyFilter] = useState("All");
   const [typeFilter, setTypeFilter] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
+
+  const [quizToDelete, setQuizToDelete] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/quizzes", {
@@ -42,11 +45,15 @@ export function Home() {
       });
   }, [token]); 
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this quiz? This cannot be undone.")) return;
+  const handleDelete = (id: number) => {
+    setQuizToDelete(id); 
+  };
+
+  const confirmDelete = async () => {
+    if (quizToDelete === null) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/quizzes/${id}`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/quizzes/${quizToDelete}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -55,13 +62,15 @@ export function Home() {
       });
 
       if (response.ok) {
-        setQuizzes(quizzes.filter((quiz) => quiz.id !== id));
+        setQuizzes(quizzes.filter((quiz) => quiz.id !== quizToDelete));
       } else {
         alert("Failed to delete quiz.");
       }
     } catch (error) {
       console.error("Error deleting quiz:", error);
       alert("An error occurred while deleting.");
+    } finally {
+      setQuizToDelete(null);
     }
   };
 
@@ -78,7 +87,37 @@ export function Home() {
   });
 
   return (
-    <div className="max-w-[1200px] mx-auto w-full">
+    <div className="max-w-[1200px] mx-auto w-full relative">
+      
+      {quizToDelete !== null && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setQuizToDelete(null)} />
+          <div className="relative bg-white border border-gray-100 shadow-2xl rounded-2xl p-8 w-full max-w-[320px] text-center animate-in zoom-in-95 duration-200">
+            <div className="mx-auto w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mb-4">
+              <Trash2 className="w-7 h-7 text-red-600" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Quiz?</h3>
+            <p className="text-sm text-gray-500 mb-8 leading-relaxed">
+              Are you sure you want to permanently delete this quiz? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setQuizToDelete(null)}
+                className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition-all active:scale-[0.95]"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDelete}
+                className="flex-1 bg-red-600 text-white py-3 rounded-xl font-bold hover:bg-red-700 transition-all active:scale-[0.95] shadow-lg shadow-red-200"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold text-gray-900 tracking-tight">My Saved Quizzes</h2>

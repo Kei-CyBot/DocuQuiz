@@ -19,6 +19,20 @@ export function EditQuiz() {
   });
 
   const [showSuccess, setShowSuccess] = useState(false);
+  
+  const [questionToDelete, setQuestionToDelete] = useState<number | null>(null);
+
+  const normalizeQuestionType = (rawType: any) => {
+    if (!rawType) return 'multiple_choice';
+    
+    const t = String(rawType).toLowerCase().trim();
+    
+    if (t === 'identification' || t.includes('ident')) return 'identification';
+    if (t === 'fill_in_the_blank' || t.includes('fill') || t.includes('blank')) return 'fill_in_the_blank';
+    if (t === 'true_false' || t.includes('true') || t.includes('false') || t === 'tf') return 'true_false';
+    
+    return 'multiple_choice';
+  };
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -41,8 +55,10 @@ export function EditQuiz() {
         
         const backendQuestions = quizData.questions || [];
 
-        const formattedQuestions = backendQuestions.map((q: any) => {
-          const type = q.type?.toLowerCase() || 'multiple_choice'; 
+        const formattedQuestions = backendQuestions.map((q: any, index: number) => {
+          console.log(`Question ${index + 1} raw type from backend:`, q.type);
+          
+          const type = normalizeQuestionType(q.type); 
           
           let parsedOptions = ["", "", "", ""];
           if (q.options) {
@@ -98,7 +114,14 @@ export function EditQuiz() {
   };
 
   const removeQuestion = (id: number) => {
-    setQuestions(questions.filter(q => q.id !== id));
+    setQuestionToDelete(id); 
+  };
+
+  const confirmDelete = () => {
+    if (questionToDelete !== null) {
+      setQuestions(questions.filter(q => q.id !== questionToDelete));
+      setQuestionToDelete(null); 
+    }
   };
 
   const updateQuestionText = (id: number, text: string) => {
@@ -244,6 +267,35 @@ export function EditQuiz() {
         </div>
       )}
 
+      {questionToDelete !== null && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setQuestionToDelete(null)} />
+          <div className="relative bg-white border border-gray-100 shadow-2xl rounded-2xl p-8 w-full max-w-[320px] text-center animate-in zoom-in-95 duration-200">
+            <div className="mx-auto w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mb-4">
+              <Trash2 className="w-7 h-7 text-red-600" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Question?</h3>
+            <p className="text-sm text-gray-500 mb-8 leading-relaxed">
+              Are you sure you want to remove this question? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setQuestionToDelete(null)}
+                className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition-all active:scale-[0.95]"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDelete}
+                className="flex-1 bg-red-600 text-white py-3 rounded-xl font-bold hover:bg-red-700 transition-all active:scale-[0.95] shadow-lg shadow-red-200"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="pt-8 pb-2">
         <Link to="/" className="text-gray-500 hover:text-gray-900 flex items-center gap-2 font-medium transition-colors w-fit">
           <ArrowLeft className="w-5 h-5" />
@@ -290,6 +342,7 @@ export function EditQuiz() {
                     <option value="multiple_choice">Multiple Choice</option>
                     <option value="identification">Identification</option>
                     <option value="fill_in_the_blank">Fill in the Blank</option>
+                    <option value="true_false">True/False</option>
                     </select>
                 </div>
 
@@ -348,6 +401,33 @@ export function EditQuiz() {
                   </p>
                 </div>
               )}
+
+              {q.type === 'true_false' && (
+                <div className="bg-blue-50/50 p-4 rounded-lg border border-blue-100 flex items-center gap-6">
+                  <span className="text-sm font-semibold text-blue-900">Correct Answer:</span>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name={`tf-${q.id}`}
+                      checked={String(q.exactAnswer).toLowerCase() === 'true'}
+                      onChange={() => updateExactAnswer(q.id, 'True')}
+                      className="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-600 accent-indigo-600"
+                    />
+                    <span className="font-medium text-gray-800">True</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name={`tf-${q.id}`}
+                      checked={String(q.exactAnswer).toLowerCase() === 'false'}
+                      onChange={() => updateExactAnswer(q.id, 'False')}
+                      className="w-5 h-5 text-indigo-600 border-gray-300 focus:ring-indigo-600 accent-indigo-600"
+                    />
+                    <span className="font-medium text-gray-800">False</span>
+                  </label>
+                </div>
+              )}
+
             </div>
           </div>
         ))}

@@ -19,6 +19,8 @@ export function Library() {
 
   const { quizScores } = useScore();
 
+  const [quizToDelete, setQuizToDelete] = useState<number | null>(null);
+
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
@@ -55,27 +57,33 @@ export function Library() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm("Are you sure you want to delete this quiz? This cannot be undone.")) {
-      try {
-        const response = await fetch(`http://127.0.0.1:8000/api/quizzes/${id}`, {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Accept': 'application/json'
-          }
-        });
+  const handleDelete = (id: number) => {
+    setQuizToDelete(id); 
+    setActiveMenuId(null); 
+  };
 
-        if (response.ok) {
-          setQuizzes((prev) => prev.filter(q => q.id !== id));
-          setActiveMenuId(null);
-        } else {
-          alert("Failed to delete the quiz from the server.");
+  const confirmDelete = async () => {
+    if (quizToDelete === null) return;
+
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/quizzes/${quizToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Accept': 'application/json'
         }
-      } catch (err) {
-        console.error(err);
-        alert("Error connecting to server to delete.");
+      });
+
+      if (response.ok) {
+        setQuizzes((prev) => prev.filter(q => q.id !== quizToDelete));
+      } else {
+        alert("Failed to delete the quiz from the server.");
       }
+    } catch (err) {
+      console.error(err);
+      alert("Error connecting to server to delete.");
+    } finally {
+      setQuizToDelete(null); 
     }
   };
 
@@ -133,7 +141,37 @@ export function Library() {
   }
 
   return (
-    <div className="p-8 max-w-6xl mx-auto w-full animate-fade-in-up">
+    <div className="p-8 max-w-6xl mx-auto w-full animate-fade-in-up relative">
+      
+      {quizToDelete !== null && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setQuizToDelete(null)} />
+          <div className="relative bg-white border border-gray-100 shadow-2xl rounded-2xl p-8 w-full max-w-[320px] text-center animate-in zoom-in-95 duration-200">
+            <div className="mx-auto w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mb-4">
+              <Trash2 className="w-7 h-7 text-red-600" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Quiz?</h3>
+            <p className="text-sm text-gray-500 mb-8 leading-relaxed">
+              Are you sure you want to permanently delete this quiz? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setQuizToDelete(null)}
+                className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition-all active:scale-[0.95]"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDelete}
+                className="flex-1 bg-red-600 text-white py-3 rounded-xl font-bold hover:bg-red-700 transition-all active:scale-[0.95] shadow-lg shadow-red-200"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">My Library</h1>
@@ -171,9 +209,7 @@ export function Library() {
         </div>
       </div>
 
-      {/* Removed overflow-hidden from this container so the dropdown can break out if necessary */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200" ref={menuRef}>
-        {/* Added rounded-t-2xl to the header to preserve top border radius */}
         <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between rounded-t-2xl">
           <h3 className="font-bold text-gray-800">All Materials</h3>
         </div>
@@ -183,7 +219,6 @@ export function Library() {
             No quizzes found in your library yet. Generate one to get started!
           </div>
         ) : (
-          /* Added max-h-[600px] and overflow-y-auto to create the scrollbar, and pb-24 so the last item's dropdown isn't cut off by the scroll boundary */
           <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto pb-24 rounded-b-2xl">
             {quizzes.map((quiz) => {
               const userPoints = quizScores[quiz.id];

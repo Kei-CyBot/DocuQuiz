@@ -24,6 +24,7 @@ class QuizController extends Controller
 
         return response()->json($quizzes, 200);
     }
+
     public function generate(Request $request)
     {
         $apiKey = env('GEMINI_API_KEY');
@@ -62,14 +63,18 @@ class QuizController extends Controller
                 Storage::delete($path);
 
                 $prompt = "You are an expert teacher. Create a {$request->question_count}-question {$request->difficulty} {$request->type} quiz based ONLY on the following text. " .
-                    "Any custom instructions: {$request->instructions}. " .
-                    "You MUST respond ONLY with a raw, valid JSON array. Do not include markdown formatting like ```json. " .
-                    "Use this exact format: [{\"question\": \"...\", \"options\": [\"A\", \"B\", \"C\", \"D\"], \"answer\": \"...\"}] " .
-                    "Text to analyze: " . substr($extractedText, 0, 30000);
+                "Any custom instructions: {$request->instructions}. " .
+                "You MUST respond ONLY with a raw, valid JSON array of objects. Do not include markdown formatting like ```json. " .
+                "Each object in the array MUST contain EXACTLY these 4 keys: " .
+                "1. 'question' (string) " .
+                "2. 'type' (string - MUST be exactly one of these: 'multiple_choice', 'true_false', 'identification', or 'fill_in_the_blank') " .
+                "3. 'options' (array of strings - leave empty if the type is not multiple_choice) " .
+                "4. 'answer' (string). " .
+                "Text to analyze: " . substr($extractedText, 0, 30000);
+                
 
                 $apiKey = trim(env('GEMINI_API_KEY'));
                 $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $apiKey;
-
                 $response = Http::withHeaders([
                     'Content-Type' => 'application/json',
                 ])->post($url, [
@@ -107,6 +112,7 @@ class QuizController extends Controller
                     foreach ($quizData as $item) {
                         $quiz->questions()->create([
                             'question' => $item['question'],
+                            'type' => $item['type'] ?? 'multiple_choice', 
                             'options' => $item['options'] ?? null,
                             'answer' => $item['answer']
                         ]);
@@ -165,6 +171,7 @@ class QuizController extends Controller
         foreach ($request->questions as $q) {
             $quiz->questions()->create([
                 'question' => $q['text'],
+                'type' => $q['type'] ?? 'multiple_choice',
                 'options' => $q['options'] ?? null,
                 'answer' => $q['answer']
             ]);
