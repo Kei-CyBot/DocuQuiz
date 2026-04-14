@@ -2,15 +2,26 @@
 
 A full-stack web application that allows students and educators to seamlessly generate AI-powered quizzes, track their study statistics, and manage their learning profiles.
 
+## Members
+
+# Project Manager: 
+* Ethan Gabrielle E. Delos Santos
+# Frontend Developer:
+* Louie Jay A. Alconera
+# Backend Developer:
+* Anton Daryl A. Brua
+# QA Analysts:
+* Jann Florence G. Abad
+
 ## 🚀 Tech Stack
 
-**Frontend:**
+# Frontend:
 * React
 * Vite
 * Tailwind CSS
 * Lucide Icons
 
-**Backend:**
+# Backend:
 * Laravel (PHP)
 * MySQL
 * Google Gemini API
@@ -25,14 +36,14 @@ To run this project locally, you will need to have the following installed on yo
 * [Composer](https://getcomposer.org/)
 * A local database server like MySQL (via [XAMPP](https://www.apachefriends.org/), 
 
----
+========================================================================================
 
 ## 🛠️ Local Installation & Setup
 
 Follow these steps to get the development environment running on your machine.
 
 ### 1. Clone the Repository
-Open your terminal and run:
+Open your terminal and run to GitBash or Command Prompt:
 
 git clone [https://github.com/Kei-CyBot/DocuQuiz.git](https://github.com/Kei-CyBot/DocuQuiz.git)
 cd DocuQuiz
@@ -50,6 +61,8 @@ cp .env.example .env
 # Generate the application key
 php artisan key:generate
 
+========================================================================================
+
 **Configure Environment Variables:**
 Open the newly created `.env` file in the `backend` folder and update your database and API settings:
 
@@ -63,7 +76,11 @@ DB_PASSWORD=
 
 # 2. Add your Google Gemini API Key
 # You can get a free key here: [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
+
+# 3. Access the created .env file and paste this in
 GEMINI_API_KEY=your_actual_api_key_here
+
+========================================================================================
 
 **Run Migrations & Start Server:**
 
@@ -83,6 +100,8 @@ cd frontend
 # Install Node dependencies
 npm install
 
+========================================================================================
+
 **Configure Frontend Environment:**
 Create a `.env` file in the `frontend` folder and add the path to your local backend API:
 
@@ -93,7 +112,7 @@ VITE_API_BASE_URL=http://localhost:8000/api
 # Start the Vite development server
 npm run dev
 
----
+========================================================================================
 
 ## 📖 Usage
 
